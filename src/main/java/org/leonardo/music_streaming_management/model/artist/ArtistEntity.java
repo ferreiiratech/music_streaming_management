@@ -3,10 +3,12 @@ package org.leonardo.music_streaming_management.model.artist;
 import jakarta.persistence.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
 @Entity(name = "tb_artist")
+@EntityListeners(AuditingEntityListener.class)
 public class ArtistEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
