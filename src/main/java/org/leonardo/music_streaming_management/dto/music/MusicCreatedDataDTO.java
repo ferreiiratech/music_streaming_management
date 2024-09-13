@@ -4,7 +4,7 @@ import java.time.LocalDate;
 
 public record MusicCreatedDataDTO(
         String title,
-        String gente,
+        String genre,
         int duration,
         LocalDate releaseDate,
         String artist,

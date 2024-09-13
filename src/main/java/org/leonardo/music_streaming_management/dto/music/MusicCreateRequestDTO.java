@@ -1,13 +1,12 @@
 package org.leonardo.music_streaming_management.dto.music;
 
-
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public record MusicCreateRequestDTO(
         String title,
-        String gente,
+        String genre,
         int duration,
-        LocalDate releaseDate,
+        LocalDateTime releaseDate,
         String artist,
         String album
 ) {
