@@ -20,7 +20,7 @@ public class MusicController {
     @PostMapping("/create")
     public ResponseEntity<MusicCreatedResponseDTO> createMusic(@RequestBody MusicRequestDTO musicRequestDTO) {
         MusicCreatedResponseDTO musicCreatedResponseDTO = musicService.createMusic(musicRequestDTO);
-        return ResponseEntity.ok(musicCreatedResponseDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(musicCreatedResponseDTO);
     }
 
     @PatchMapping("/{id}/update")
