@@ -26,4 +26,10 @@ public class ArtistController {
         ArtistUpdateResponseDTO artistUpdateResponseDTO = artistService.updateArtist(id, artistRequestDTO);
         return ResponseEntity.status(HttpStatus.OK).body(artistUpdateResponseDTO);
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ArtistGetResponseDTO> getArtistById(@PathVariable Long id) {
+        ArtistGetResponseDTO artistGetResponseDTO = artistService.getArtistById(id);
+        return ResponseEntity.status(HttpStatus.OK).body(artistGetResponseDTO);
+    }
 }
