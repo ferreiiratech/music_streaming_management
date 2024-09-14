@@ -46,6 +46,32 @@ public class ArtistServiceImpl implements IArtistService {
         }
     }
 
+    @Override
+    public ArtistUpdateResponseDTO updateArtist(Long artistId, ArtistRequestDTO artistRequestDTO){
+        try {
+            validateDataArtist(artistRequestDTO);
+
+            Optional<ArtistEntity> artistFound = artistRepository.findByName(artistRequestDTO.name());
+
+            if(artistFound.isPresent()){
+                throw new IllegalArgumentException("Artist name already exists");
+            }
+
+            ArtistEntity artistExisting = getExistingArtist(artistId);
+            BeanUtils.copyProperties(artistRequestDTO, artistExisting);
+
+            ArtistEntity artistUpdated = artistRepository.save(artistExisting);
+
+            return new ArtistUpdateResponseDTO(
+                    true,
+                    "Artist updated successfully",
+                    new ArtistDataDTO(artistUpdated.getName(), artistUpdated.getNationality())
+            );
+        } catch (DataAccessResourceFailureException exception){
+            throw new AccessDatabaseFailureException("An internal error has occurred. Try again later");
+        }
+    }
+
     private ArtistEntity getExistingArtist(Long artistId){
         try {
             Optional<ArtistEntity> artistFound = artistRepository.findById(artistId);
