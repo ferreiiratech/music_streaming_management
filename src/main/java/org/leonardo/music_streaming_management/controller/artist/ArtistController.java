@@ -41,4 +41,10 @@ public class ArtistController {
         ArtistListResponseDTO artistListResponseDTO = artistService.getAllArtist(page, size);
         return ResponseEntity.status(HttpStatus.OK).body(artistListResponseDTO);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ArtistDeleteResponseDTO> deleteArtistById(@PathVariable Long id) {
+        ArtistDeleteResponseDTO artistDeleteResponseDTO = artistService.deleteArtistById(id);
+        return ResponseEntity.status(HttpStatus.OK).body(artistDeleteResponseDTO);
+    }
 }
