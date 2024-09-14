@@ -1,10 +1,7 @@
 package org.leonardo.music_streaming_management.service.music;
 
 import org.leonardo.music_streaming_management.config.exception.AccessDatabaseFailureException;
-import org.leonardo.music_streaming_management.dto.music.MusicRequestDTO;
-import org.leonardo.music_streaming_management.dto.music.MusicDataDTO;
-import org.leonardo.music_streaming_management.dto.music.MusicCreatedResponseDTO;
-import org.leonardo.music_streaming_management.dto.music.MusicUpdatedResponseDTO;
+import org.leonardo.music_streaming_management.dto.music.*;
 import org.leonardo.music_streaming_management.model.album.AlbumEntity;
 import org.leonardo.music_streaming_management.model.artist.ArtistEntity;
 import org.leonardo.music_streaming_management.model.music.MusicEntity;
@@ -105,6 +102,28 @@ public class MusicServiceImpl implements IMusicService {
                         musicUpdated.getReleaseDate(),
                         musicUpdated.getArtist().getName(),
                         musicUpdated.getAlbum().getTitle()
+                )
+        );
+    }
+
+    @Override
+    public MusicGetResponseDTO getMusicById(Long musicId) {
+        Optional<MusicEntity> musicFound = musicRepository.findById(musicId);
+
+        if(musicFound.isEmpty()) {
+            throw new MusicNotFoundException("Music not found");
+        }
+
+        return new MusicGetResponseDTO(
+                true,
+                "Music found success",
+                new MusicDataDTO(
+                        musicFound.get().getTitle(),
+                        musicFound.get().getGenre(),
+                        musicFound.get().getDuration(),
+                        musicFound.get().getReleaseDate(),
+                        musicFound.get().getArtist().getName(),
+                        musicFound.get().getAlbum().getTitle()
                 )
         );
     }
