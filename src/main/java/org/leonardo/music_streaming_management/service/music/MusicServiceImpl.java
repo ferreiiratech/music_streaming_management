@@ -126,6 +126,22 @@ public class MusicServiceImpl implements IMusicService {
         }
     }
 
+    @Override
+    public MusicDeleteResponseDTO deleteMusic(Long musicId) {
+        try {
+            MusicEntity musicFound = getExistingMusic(musicId);
+
+            musicRepository.delete(musicFound);
+
+            return new MusicDeleteResponseDTO(
+                    true,
+                    "Music deleted successfully"
+            );
+        } catch (DataAccessResourceFailureException exception) {
+            throw new AccessDatabaseFailureException("An internal error has occurred. Try again later");
+        }
+    }
+
     private MusicEntity getExistingMusic(Long musicId) {
         try {
             Optional<MusicEntity> musicFound = musicRepository.findById(musicId);
