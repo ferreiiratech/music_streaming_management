@@ -3,6 +3,9 @@ package org.leonardo.music_streaming_management.service.artist;
 import org.leonardo.music_streaming_management.config.exception.AccessDatabaseFailureException;
 import org.leonardo.music_streaming_management.dto.artist.*;
 import org.leonardo.music_streaming_management.model.artist.ArtistEntity;
+import org.leonardo.music_streaming_management.model.artist.exception.ArtistNotFoundException;
+import org.leonardo.music_streaming_management.model.artist.exception.InvalidArtistNameException;
+import org.leonardo.music_streaming_management.model.artist.exception.InvalidArtistNationalityException;
 import org.leonardo.music_streaming_management.repository.artist.IArtistRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.dao.DataAccessResourceFailureException;
@@ -30,7 +33,7 @@ public class ArtistServiceImpl implements IArtistService {
             Optional<ArtistEntity> artistFound = artistRepository.findByName(artistRequestDTO.name());
 
             if(artistFound.isPresent()){
-                throw new IllegalArgumentException("Artist already exists");
+                throw new InvalidArtistNameException("Artist already exists");
             }
 
             ArtistEntity artistEntity = new ArtistEntity(artistRequestDTO.name(), artistRequestDTO.nationality());
@@ -54,7 +57,7 @@ public class ArtistServiceImpl implements IArtistService {
             Optional<ArtistEntity> artistFound = artistRepository.findByName(artistRequestDTO.name());
 
             if(artistFound.isPresent()){
-                throw new IllegalArgumentException("Artist name already exists");
+                throw new InvalidArtistNameException("Artist name already exists");
             }
 
             ArtistEntity artistExisting = getExistingArtist(artistId);
@@ -75,16 +78,12 @@ public class ArtistServiceImpl implements IArtistService {
     @Override
     public ArtistGetResponseDTO getArtistById(Long artistId){
         try {
-            Optional<ArtistEntity> artistEntity = artistRepository.findById(artistId);
-
-            if (artistEntity.isEmpty()) {
-                throw new IllegalArgumentException("Artist not found");
-            }
+            ArtistEntity artistEntity = getExistingArtist(artistId);
 
             return new ArtistGetResponseDTO(
                     true,
                     "Artist founded successfully",
-                    new ArtistDataDTO(artistEntity.get().getName(), artistEntity.get().getNationality())
+                    new ArtistDataDTO(artistEntity.getName(), artistEntity.getNationality())
             );
 
         } catch (DataAccessResourceFailureException exception){
@@ -117,13 +116,9 @@ public class ArtistServiceImpl implements IArtistService {
     @Override
     public ArtistDeleteResponseDTO deleteArtistById(Long artistId) {
         try {
-            Optional<ArtistEntity> artistFound = artistRepository.findById(artistId);
+            ArtistEntity artistFound = getExistingArtist(artistId);
 
-            if(artistFound.isEmpty()){
-                throw new IllegalArgumentException("Artist not found");
-            }
-
-            artistRepository.deleteById(artistId);
+            artistRepository.delete(artistFound);
 
             return new ArtistDeleteResponseDTO(
                     true,
@@ -139,7 +134,7 @@ public class ArtistServiceImpl implements IArtistService {
             Optional<ArtistEntity> artistFound = artistRepository.findById(artistId);
 
             if(artistFound.isEmpty()){
-                throw new IllegalArgumentException("Artist not found");
+                throw new ArtistNotFoundException("Artist not found");
             }
 
             return artistFound.get();
@@ -150,11 +145,11 @@ public class ArtistServiceImpl implements IArtistService {
 
     private void validateDataArtist(ArtistRequestDTO artistRequestDTO){
         if(artistRequestDTO.name() == null || artistRequestDTO.name().isEmpty()){
-            throw new IllegalArgumentException("Artist name cannot be empty");
+            throw new InvalidArtistNameException("Artist name cannot be empty");
         }
 
         if(artistRequestDTO.nationality() == null || artistRequestDTO.nationality().isEmpty()){
-            throw new IllegalArgumentException("Nationality cannot be empty");
+            throw new InvalidArtistNationalityException("Nationality cannot be empty");
         }
     }
 }
