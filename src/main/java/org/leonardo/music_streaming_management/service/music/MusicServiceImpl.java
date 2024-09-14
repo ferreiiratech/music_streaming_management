@@ -8,27 +8,31 @@ import org.leonardo.music_streaming_management.model.music.MusicEntity;
 import org.leonardo.music_streaming_management.model.music.exception.*;
 import org.leonardo.music_streaming_management.repository.album.AlbumRepository;
 import org.leonardo.music_streaming_management.repository.artist.ArtistRepository;
-import org.leonardo.music_streaming_management.repository.music.MusicRepository;
+import org.leonardo.music_streaming_management.repository.music.IMusicRepository;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.chrono.ChronoLocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
 public class MusicServiceImpl implements IMusicService {
-    private final MusicRepository musicRepository;
+    private final IMusicRepository IMusicRepository;
     private final AlbumRepository albumRepository;
     private final ArtistRepository artistRepository;
 
     public MusicServiceImpl(
-            MusicRepository musicRepository,
+            IMusicRepository IMusicRepository,
             AlbumRepository albumRepository,
             ArtistRepository artistRepository
     ) {
-        this.musicRepository = musicRepository;
+        this.IMusicRepository = IMusicRepository;
         this.albumRepository = albumRepository;
         this.artistRepository = artistRepository;
     }
@@ -38,7 +42,7 @@ public class MusicServiceImpl implements IMusicService {
         try{
             validateMusicDate(musicRequestDTO);
 
-            Optional<MusicEntity> musicFound = musicRepository.findByTitle(musicRequestDTO.title());
+            Optional<MusicEntity> musicFound = IMusicRepository.findByTitle(musicRequestDTO.title());
 
             if(musicFound.isPresent()) {
                 throw new InvalidMusicTitleException("Music title already exists");
@@ -53,7 +57,7 @@ public class MusicServiceImpl implements IMusicService {
             musicEntity.setAlbum(albumFound);
             musicEntity.setArtist(artistFound);
 
-            MusicEntity musicCreated = musicRepository.save(musicEntity);
+            MusicEntity musicCreated = IMusicRepository.save(musicEntity);
 
             return new MusicCreatedResponseDTO(
                     true,
@@ -85,7 +89,7 @@ public class MusicServiceImpl implements IMusicService {
             musicFound.setArtist(artistFound);
             musicFound.setAlbum(albumFound);
 
-            MusicEntity musicUpdated = musicRepository.save(musicFound);
+            MusicEntity musicUpdated = IMusicRepository.save(musicFound);
 
             return new MusicUpdatedResponseDTO(
                     true,
@@ -131,7 +135,7 @@ public class MusicServiceImpl implements IMusicService {
         try {
             MusicEntity musicFound = getExistingMusic(musicId);
 
-            musicRepository.delete(musicFound);
+            IMusicRepository.delete(musicFound);
 
             return new MusicDeleteResponseDTO(
                     true,
@@ -142,9 +146,80 @@ public class MusicServiceImpl implements IMusicService {
         }
     }
 
+    @Override
+    public SearchMusicResponseDTO searchMusics(
+            Optional<String> musicTitle,
+            Optional<String> musicGenre,
+            Optional<String> artistName,
+            Optional<String> albumTitle,
+            int page,
+            int size
+    ) {
+        try {
+            Page<MusicEntity> musicEntityPage = IMusicRepository.findAll(PageRequest.of(page, size));
+            List<MusicEntity> musicEntityList = musicEntityPage.getContent();
+
+            if(musicTitle.isPresent()) {
+                musicEntityList = musicEntityList.stream()
+                        .filter(musicEntity -> musicEntity
+                                .getTitle()
+                                .toLowerCase()
+                                .contains(musicTitle.get().toLowerCase())
+                        ).toList();
+            }
+
+            if(musicGenre.isPresent()) {
+                musicEntityList = musicEntityList.stream()
+                        .filter(musicEntity -> musicEntity
+                                .getGenre()
+                                .toLowerCase()
+                                .contains(musicGenre.get().toLowerCase())
+                        ).toList();
+            }
+
+            if(artistName.isPresent()) {
+                musicEntityList = musicEntityList.stream()
+                        .filter(musicEntity -> musicEntity
+                                .getArtist().getName()
+                                .toLowerCase()
+                                .contains(artistName.get().toLowerCase())
+                        ).toList();
+            }
+
+            if(albumTitle.isPresent()) {
+                musicEntityList = musicEntityList.stream()
+                        .filter(musicEntity -> musicEntity
+                                .getAlbum().getTitle()
+                                .toLowerCase()
+                                .contains(albumTitle.get().toLowerCase())
+                        ).toList();
+            }
+
+            List<MusicDataDTO> musicDataDTOList = new ArrayList<>();
+            musicEntityList.forEach(musicEntity -> musicDataDTOList.add(
+                    new MusicDataDTO(
+                            musicEntity.getTitle(),
+                            musicEntity.getGenre(),
+                            musicEntity.getDuration(),
+                            musicEntity.getReleaseDate(),
+                            musicEntity.getArtist().getName(),
+                            musicEntity.getAlbum().getTitle()
+                    )
+            ));
+
+            return new SearchMusicResponseDTO(
+                    true,
+                    "Pesquisa realizada com sucesso",
+                    musicDataDTOList
+            );
+        } catch (DataAccessResourceFailureException exception){
+            throw new AccessDatabaseFailureException("An internal error has occurred. Try again later");
+        }
+    }
+
     private MusicEntity getExistingMusic(Long musicId) {
         try {
-            Optional<MusicEntity> musicFound = musicRepository.findById(musicId);
+            Optional<MusicEntity> musicFound = IMusicRepository.findById(musicId);
 
             if(musicFound.isEmpty()) {
                 throw new MusicNotFoundException("Music not found");
