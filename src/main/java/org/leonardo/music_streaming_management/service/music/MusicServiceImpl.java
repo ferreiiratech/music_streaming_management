@@ -51,10 +51,12 @@ public class MusicServiceImpl implements IMusicService {
 
             AlbumEntity albumFound = getExistingAlbum(musicRequestDTO.album());
 
-            MusicEntity musicCreated = new MusicEntity();
-            BeanUtils.copyProperties(musicRequestDTO, musicCreated);
-            musicCreated.setAlbum(albumFound);
-            musicCreated.setArtist(artistFound);
+            MusicEntity musicEntity = new MusicEntity();
+            BeanUtils.copyProperties(musicRequestDTO, musicEntity);
+            musicEntity.setAlbum(albumFound);
+            musicEntity.setArtist(artistFound);
+
+            MusicEntity musicCreated = musicRepository.save(musicEntity);
 
             return new MusicCreatedResponseDTO(
                     true,
