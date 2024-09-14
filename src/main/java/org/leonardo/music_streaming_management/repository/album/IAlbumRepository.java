@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface AlbumRepository extends JpaRepository<AlbumEntity, Long> {
+public interface IAlbumRepository extends JpaRepository<AlbumEntity, Long> {
     Optional<AlbumEntity> findByTitle(String album);
 }
