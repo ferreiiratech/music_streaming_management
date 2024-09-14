@@ -20,4 +20,10 @@ public class ArtistController {
         ArtistCreatedResponseDTO artistCreatedResponseDTO = artistService.createArtist(artistRequestDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(artistCreatedResponseDTO);
     }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<ArtistUpdateResponseDTO> updateArtist(@PathVariable Long id, @RequestBody ArtistRequestDTO artistRequestDTO) {
+        ArtistUpdateResponseDTO artistUpdateResponseDTO = artistService.updateArtist(id, artistRequestDTO);
+        return ResponseEntity.status(HttpStatus.OK).body(artistUpdateResponseDTO);
+    }
 }
