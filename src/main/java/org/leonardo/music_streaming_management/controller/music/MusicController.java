@@ -1,9 +1,6 @@
 package org.leonardo.music_streaming_management.controller.music;
 
-import org.leonardo.music_streaming_management.dto.music.MusicGetResponseDTO;
-import org.leonardo.music_streaming_management.dto.music.MusicRequestDTO;
-import org.leonardo.music_streaming_management.dto.music.MusicCreatedResponseDTO;
-import org.leonardo.music_streaming_management.dto.music.MusicUpdatedResponseDTO;
+import org.leonardo.music_streaming_management.dto.music.*;
 import org.leonardo.music_streaming_management.service.music.IMusicService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,5 +31,11 @@ public class MusicController {
     public ResponseEntity<MusicGetResponseDTO> getMusicById(@PathVariable Long id) {
         MusicGetResponseDTO musicGetResponseDTO = musicService.getMusicById(id);
         return ResponseEntity.status(HttpStatus.OK).body(musicGetResponseDTO);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<MusicDeleteResponseDTO> deleteMusic(@PathVariable Long id) {
+        MusicDeleteResponseDTO musicDeleteResponseDTO = musicService.deleteMusic(id);
+        return ResponseEntity.status(HttpStatus.OK).body(musicDeleteResponseDTO);
     }
 }
