@@ -2,7 +2,9 @@ package org.leonardo.music_streaming_management.controller.music;
 
 import org.leonardo.music_streaming_management.dto.music.MusicRequestDTO;
 import org.leonardo.music_streaming_management.dto.music.MusicCreatedResponseDTO;
+import org.leonardo.music_streaming_management.dto.music.MusicUpdatedResponseDTO;
 import org.leonardo.music_streaming_management.service.music.IMusicService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,5 +21,11 @@ public class MusicController {
     public ResponseEntity<MusicCreatedResponseDTO> createMusic(@RequestBody MusicRequestDTO musicRequestDTO) {
         MusicCreatedResponseDTO musicCreatedResponseDTO = musicService.createMusic(musicRequestDTO);
         return ResponseEntity.ok(musicCreatedResponseDTO);
+    }
+
+    @PatchMapping("/{id}/update")
+    public ResponseEntity<MusicUpdatedResponseDTO> updateMusic(@PathVariable Long id, @RequestBody MusicRequestDTO musicRequestDTO) {
+        MusicUpdatedResponseDTO musicUpdatedResponseDTO = musicService.updateMusic(id, musicRequestDTO);
+        return ResponseEntity.status(HttpStatus.OK).body(musicUpdatedResponseDTO);
     }
 }
