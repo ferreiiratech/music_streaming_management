@@ -74,58 +74,66 @@ public class MusicServiceImpl implements IMusicService {
 
     @Override
     public MusicUpdatedResponseDTO updateMusic(Long musicId, MusicRequestDTO musicRequestDTO) {
-        validateMusicDate(musicRequestDTO);
+        try {
+            validateMusicDate(musicRequestDTO);
 
-        Optional<MusicEntity> musicFound = musicRepository.findById(musicId);
+            Optional<MusicEntity> musicFound = musicRepository.findById(musicId);
 
-        if(musicFound.isEmpty()) {
-            throw new MusicNotFoundException("Music not found");
+            if(musicFound.isEmpty()) {
+                throw new MusicNotFoundException("Music not found");
+            }
+
+            ArtistEntity artistFound = getExistingArtist(musicRequestDTO.artist());
+
+            AlbumEntity albumFound = getExistingAlbum(musicRequestDTO.album());
+
+            BeanUtils.copyProperties(musicRequestDTO, musicFound.get());
+            musicFound.get().setArtist(artistFound);
+            musicFound.get().setAlbum(albumFound);
+
+            MusicEntity musicUpdated = musicRepository.save(musicFound.get());
+
+            return new MusicUpdatedResponseDTO(
+                    true,
+                    "Music updated with success",
+                    new MusicDataDTO(
+                            musicUpdated.getTitle(),
+                            musicUpdated.getGenre(),
+                            musicUpdated.getDuration(),
+                            musicUpdated.getReleaseDate(),
+                            musicUpdated.getArtist().getName(),
+                            musicUpdated.getAlbum().getTitle()
+                    )
+            );
+        } catch (DataAccessResourceFailureException exception){
+            throw new AccessDatabaseFailureException("An internal error has occurred. Try again later");
         }
-
-        ArtistEntity artistFound = getExistingArtist(musicRequestDTO.artist());
-
-        AlbumEntity albumFound = getExistingAlbum(musicRequestDTO.album());
-
-        BeanUtils.copyProperties(musicRequestDTO, musicFound.get());
-        musicFound.get().setArtist(artistFound);
-        musicFound.get().setAlbum(albumFound);
-
-        MusicEntity musicUpdated = musicRepository.save(musicFound.get());
-
-        return new MusicUpdatedResponseDTO(
-                true,
-                "Music updated with success",
-                new MusicDataDTO(
-                        musicUpdated.getTitle(),
-                        musicUpdated.getGenre(),
-                        musicUpdated.getDuration(),
-                        musicUpdated.getReleaseDate(),
-                        musicUpdated.getArtist().getName(),
-                        musicUpdated.getAlbum().getTitle()
-                )
-        );
     }
 
     @Override
     public MusicGetResponseDTO getMusicById(Long musicId) {
-        Optional<MusicEntity> musicFound = musicRepository.findById(musicId);
+        try {
+            Optional<MusicEntity> musicFound = musicRepository.findById(musicId);
 
-        if(musicFound.isEmpty()) {
-            throw new MusicNotFoundException("Music not found");
+            if(musicFound.isEmpty()) {
+                throw new MusicNotFoundException("Music not found");
+            }
+
+            return new MusicGetResponseDTO(
+                    true,
+                    "Music found success",
+                    new MusicDataDTO(
+                            musicFound.get().getTitle(),
+                            musicFound.get().getGenre(),
+                            musicFound.get().getDuration(),
+                            musicFound.get().getReleaseDate(),
+                            musicFound.get().getArtist().getName(),
+                            musicFound.get().getAlbum().getTitle()
+                    )
+            );
+        } catch (DataAccessResourceFailureException exception) {
+            throw new AccessDatabaseFailureException("An internal error has occurred. Try again later");
         }
-
-        return new MusicGetResponseDTO(
-                true,
-                "Music found success",
-                new MusicDataDTO(
-                        musicFound.get().getTitle(),
-                        musicFound.get().getGenre(),
-                        musicFound.get().getDuration(),
-                        musicFound.get().getReleaseDate(),
-                        musicFound.get().getArtist().getName(),
-                        musicFound.get().getAlbum().getTitle()
-                )
-        );
     }
 
     private AlbumEntity getExistingAlbum(String albumName) {
