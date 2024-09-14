@@ -7,4 +7,5 @@ public interface IArtistService {
     ArtistUpdateResponseDTO updateArtist(Long artistId, ArtistRequestDTO artistRequestDTO);
     ArtistGetResponseDTO getArtistById(Long artistId);
     ArtistListResponseDTO getAllArtist(int page, int size);
+    ArtistDeleteResponseDTO deleteArtistById(Long artistId);
 }
