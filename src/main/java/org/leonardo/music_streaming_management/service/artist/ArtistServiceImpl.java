@@ -92,6 +92,28 @@ public class ArtistServiceImpl implements IArtistService {
         }
     }
 
+    @Override
+    public ArtistListResponseDTO getAllArtist(int page, int size) {
+        try {
+            Page<ArtistEntity> artistEntityPage = artistRepository.findAll(PageRequest.of(page, size));
+
+            List<ArtistEntity> artistEntityList = artistEntityPage.getContent();
+
+            List<ArtistDataDTO> artistDataDTOList = new ArrayList<>();
+            artistEntityList.forEach(artistEntity -> artistDataDTOList.add(
+                    new ArtistDataDTO(artistEntity.getName(), artistEntity.getNationality()))
+            );
+
+            return new ArtistListResponseDTO(
+                    true,
+                    "List of artist founded successfully",
+                    artistDataDTOList
+            );
+        } catch (DataAccessResourceFailureException exception){
+            throw new AccessDatabaseFailureException("An internal error has occurred. Try again later");
+        }
+    }
+
     private ArtistEntity getExistingArtist(Long artistId){
         try {
             Optional<ArtistEntity> artistFound = artistRepository.findById(artistId);
