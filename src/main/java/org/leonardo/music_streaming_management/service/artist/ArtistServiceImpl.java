@@ -72,6 +72,26 @@ public class ArtistServiceImpl implements IArtistService {
         }
     }
 
+    @Override
+    public ArtistGetResponseDTO getArtistById(Long artistId){
+        try {
+            Optional<ArtistEntity> artistEntity = artistRepository.findById(artistId);
+
+            if (artistEntity.isEmpty()) {
+                throw new IllegalArgumentException("Artist not found");
+            }
+
+            return new ArtistGetResponseDTO(
+                    true,
+                    "Artist founded successfully",
+                    new ArtistDataDTO(artistEntity.get().getName(), artistEntity.get().getNationality())
+            );
+
+        } catch (DataAccessResourceFailureException exception){
+            throw new AccessDatabaseFailureException("An internal error has occurred. Try again later");
+        }
+    }
+
     private ArtistEntity getExistingArtist(Long artistId){
         try {
             Optional<ArtistEntity> artistFound = artistRepository.findById(artistId);
