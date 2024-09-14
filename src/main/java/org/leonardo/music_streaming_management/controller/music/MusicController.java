@@ -6,6 +6,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 @RestController
 @RequestMapping("/music")
 public class MusicController {
@@ -37,5 +39,20 @@ public class MusicController {
     public ResponseEntity<MusicDeleteResponseDTO> deleteMusic(@PathVariable Long id) {
         MusicDeleteResponseDTO musicDeleteResponseDTO = musicService.deleteMusic(id);
         return ResponseEntity.status(HttpStatus.OK).body(musicDeleteResponseDTO);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<SearchMusicResponseDTO> searchMusic(
+            @RequestParam(required = false) Optional<String> musicTitle,
+            @RequestParam(required = false) Optional<String> musicGenre,
+            @RequestParam(required = false) Optional<String> artistName,
+            @RequestParam(required = false) Optional<String> albumTitle,
+            @RequestParam(required = false, defaultValue = "0") int page,
+            @RequestParam(required = false, defaultValue = "10") int size
+    ) {
+        SearchMusicResponseDTO searchMusicResponseDTO = musicService.searchMusics(
+                musicTitle, musicGenre, artistName, albumTitle, page, size
+        );
+        return ResponseEntity.status(HttpStatus.OK).body(searchMusicResponseDTO);
     }
 }
