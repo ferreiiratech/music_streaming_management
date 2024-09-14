@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/music")
+@RequestMapping("/music")
 public class MusicController {
     private final IMusicService musicService;
 
