@@ -73,6 +73,40 @@ public class MusicServiceImpl implements IMusicService {
         }
     }
 
+    @Override
+    public MusicUpdatedResponseDTO updateMusic(Long musicId, MusicRequestDTO musicRequestDTO) {
+        validateMusicDate(musicRequestDTO);
+
+        Optional<MusicEntity> musicFound = musicRepository.findById(musicId);
+
+        if(musicFound.isEmpty()) {
+            throw new MusicNotFoundException("Music not found");
+        }
+
+        ArtistEntity artistFound = getExistingArtist(musicRequestDTO.artist());
+
+        AlbumEntity albumFound = getExistingAlbum(musicRequestDTO.album());
+
+        BeanUtils.copyProperties(musicRequestDTO, musicFound.get());
+        musicFound.get().setArtist(artistFound);
+        musicFound.get().setAlbum(albumFound);
+
+        MusicEntity musicUpdated = musicRepository.save(musicFound.get());
+
+        return new MusicUpdatedResponseDTO(
+                true,
+                "Music updated with success",
+                new MusicDataDTO(
+                        musicUpdated.getTitle(),
+                        musicUpdated.getGenre(),
+                        musicUpdated.getDuration(),
+                        musicUpdated.getReleaseDate(),
+                        musicUpdated.getArtist().getName(),
+                        musicUpdated.getAlbum().getTitle()
+                )
+        );
+    }
+
     private AlbumEntity getExistingAlbum(String albumName) {
         try {
             Optional<AlbumEntity> albumFound = albumRepository.findByTitle(albumName);
