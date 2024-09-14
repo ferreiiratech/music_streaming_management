@@ -1,6 +1,8 @@
 package org.leonardo.music_streaming_management.model.music;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.leonardo.music_streaming_management.model.album.AlbumEntity;
 import org.leonardo.music_streaming_management.model.artist.ArtistEntity;
 import org.springframework.data.annotation.CreatedDate;
@@ -20,8 +22,10 @@ public class MusicEntity {
     private int duration;
     private LocalDateTime releaseDate;
     @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private ArtistEntity artist;
     @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private AlbumEntity album;
     @CreatedDate
     private LocalDateTime createdAt;
