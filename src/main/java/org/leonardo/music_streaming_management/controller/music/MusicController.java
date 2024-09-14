@@ -1,5 +1,6 @@
 package org.leonardo.music_streaming_management.controller.music;
 
+import org.leonardo.music_streaming_management.dto.music.MusicGetResponseDTO;
 import org.leonardo.music_streaming_management.dto.music.MusicRequestDTO;
 import org.leonardo.music_streaming_management.dto.music.MusicCreatedResponseDTO;
 import org.leonardo.music_streaming_management.dto.music.MusicUpdatedResponseDTO;
@@ -23,9 +24,15 @@ public class MusicController {
         return ResponseEntity.status(HttpStatus.CREATED).body(musicCreatedResponseDTO);
     }
 
-    @PatchMapping("/{id}/update")
+    @PatchMapping("/{id}")
     public ResponseEntity<MusicUpdatedResponseDTO> updateMusic(@PathVariable Long id, @RequestBody MusicRequestDTO musicRequestDTO) {
         MusicUpdatedResponseDTO musicUpdatedResponseDTO = musicService.updateMusic(id, musicRequestDTO);
         return ResponseEntity.status(HttpStatus.OK).body(musicUpdatedResponseDTO);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<MusicGetResponseDTO> getMusicById(@PathVariable Long id) {
+        MusicGetResponseDTO musicGetResponseDTO = musicService.getMusicById(id);
+        return ResponseEntity.status(HttpStatus.OK).body(musicGetResponseDTO);
     }
 }
