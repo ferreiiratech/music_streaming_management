@@ -1,9 +1,10 @@
 package org.leonardo.music_streaming_management.service.music;
 
 import org.leonardo.music_streaming_management.config.exception.AccessDatabaseFailureException;
-import org.leonardo.music_streaming_management.dto.music.MusicCreateRequestDTO;
-import org.leonardo.music_streaming_management.dto.music.MusicCreatedDataDTO;
+import org.leonardo.music_streaming_management.dto.music.MusicRequestDTO;
+import org.leonardo.music_streaming_management.dto.music.MusicDataDTO;
 import org.leonardo.music_streaming_management.dto.music.MusicCreatedResponseDTO;
+import org.leonardo.music_streaming_management.dto.music.MusicUpdatedResponseDTO;
 import org.leonardo.music_streaming_management.model.album.AlbumEntity;
 import org.leonardo.music_streaming_management.model.artist.ArtistEntity;
 import org.leonardo.music_streaming_management.model.music.MusicEntity;
@@ -25,48 +26,44 @@ public class MusicServiceImpl implements IMusicService {
     private final AlbumRepository albumRepository;
     private final ArtistRepository artistRepository;
 
-    public MusicServiceImpl(MusicRepository musicRepository, AlbumRepository albumRepository, ArtistRepository artistRepository) {
+    public MusicServiceImpl(
+            MusicRepository musicRepository,
+            AlbumRepository albumRepository,
+            ArtistRepository artistRepository
+    ) {
         this.musicRepository = musicRepository;
         this.albumRepository = albumRepository;
         this.artistRepository = artistRepository;
     }
 
     @Override
-    public MusicCreatedResponseDTO createMusic(MusicCreateRequestDTO musicCreateRequestDTO) {
+    public MusicCreatedResponseDTO createMusic(MusicRequestDTO musicRequestDTO) {
         try{
-            validateMusicDate(musicCreateRequestDTO);
+            validateMusicDate(musicRequestDTO);
 
-            Optional<MusicEntity> musicFound = musicRepository.findByTitle(musicCreateRequestDTO.title());
+            Optional<MusicEntity> musicFound = musicRepository.findByTitle(musicRequestDTO.title());
 
             if(musicFound.isPresent()) {
                 throw new InvalidMusicTitleException("Music title already exists");
             }
 
-            Optional<ArtistEntity> artistFound = artistRepository.findByName(musicCreateRequestDTO.artist());
+            ArtistEntity artistFound = getExistingArtist(musicRequestDTO.artist());
 
-            if(artistFound.isEmpty()){
-                throw new InvalidMusicArtistException("Music artist does not exist");
-            }
-
-            Optional<AlbumEntity> albumFound = albumRepository.findByTitle(musicCreateRequestDTO.album());
-
-            if(albumFound.isEmpty()){
-                throw new InvalidMusicAlbumException("Music album does not exist");
-            }
+            AlbumEntity albumFound = getExistingAlbum(musicRequestDTO.album());
 
             MusicEntity musicCreated = new MusicEntity();
-            BeanUtils.copyProperties(musicCreateRequestDTO, musicCreated);
-            musicCreated.setAlbum(albumFound.get());
-            musicCreated.setArtist(artistFound.get());
+            BeanUtils.copyProperties(musicRequestDTO, musicCreated);
+            musicCreated.setAlbum(albumFound);
+            musicCreated.setArtist(artistFound);
 
             return new MusicCreatedResponseDTO(
                     true,
                     "Music created with success",
-                    new MusicCreatedDataDTO(
+                    new MusicDataDTO(
                             musicCreated.getTitle(),
                             musicCreated.getGenre(),
                             musicCreated.getDuration(),
-                            musicCreated.getReleaseDate().toLocalDate(),
+                            musicCreated.getReleaseDate(),
                             musicCreated.getArtist().getName(),
                             musicCreated.getAlbum().getTitle()
                     )
@@ -76,28 +73,56 @@ public class MusicServiceImpl implements IMusicService {
         }
     }
 
-    private void validateMusicDate(MusicCreateRequestDTO musicCreateRequestDTO) {
-        if(musicCreateRequestDTO.title() == null || musicCreateRequestDTO.title().isEmpty()) {
+    private AlbumEntity getExistingAlbum(String albumName) {
+        try {
+            Optional<AlbumEntity> albumFound = albumRepository.findByTitle(albumName);
+
+            if(albumFound.isEmpty()){
+                throw new InvalidMusicAlbumException("Music album does not exist");
+            }
+
+            return albumFound.get();
+        } catch (DataAccessResourceFailureException exception) {
+            throw new AccessDatabaseFailureException("An internal error has occurred. Try again later");
+        }
+    }
+
+    private ArtistEntity getExistingArtist(String artistName) {
+        try {
+            Optional<ArtistEntity> artistFound = artistRepository.findByName(artistName);
+
+            if(artistFound.isEmpty()){
+                throw new InvalidMusicArtistException("Music artist does not exist");
+            }
+
+            return artistFound.get();
+        } catch (DataAccessResourceFailureException exception) {
+            throw new AccessDatabaseFailureException("An internal error has occurred. Try again later");
+        }
+    }
+
+    private void validateMusicDate(MusicRequestDTO musicRequestDTO) {
+        if(musicRequestDTO.title() == null || musicRequestDTO.title().isEmpty()) {
             throw new InvalidMusicTitleException("Music title cannot be empty");
         }
 
-        if(musicCreateRequestDTO.genre() == null || musicCreateRequestDTO.genre().isEmpty()) {
+        if(musicRequestDTO.genre() == null || musicRequestDTO.genre().isEmpty()) {
             throw new InvalidMusicGenreException("Music genre cannot be empty");
         }
 
-        if(musicCreateRequestDTO.artist() == null || musicCreateRequestDTO.artist().isEmpty()) {
+        if(musicRequestDTO.artist() == null || musicRequestDTO.artist().isEmpty()) {
             throw new InvalidMusicArtistException("Music artist cannot be empty");
         }
 
-        if(musicCreateRequestDTO.album() == null || musicCreateRequestDTO.album().isEmpty()) {
+        if(musicRequestDTO.album() == null || musicRequestDTO.album().isEmpty()) {
             throw new InvalidMusicAlbumException("Music album cannot be empty");
         }
 
-        if(musicCreateRequestDTO.duration() <= 0){
+        if(musicRequestDTO.duration() <= 0){
             throw new InvalidMusicDurationException("Music duration cannot be negative or zero");
         }
 
-        if(musicCreateRequestDTO.releaseDate().isBefore(ChronoLocalDateTime.from(LocalDateTime.now()))){
+        if(musicRequestDTO.releaseDate().isBefore(ChronoLocalDateTime.from(LocalDateTime.now()))){
             throw new InvalidMusicReleaseDateException("Music release date cannot be before current date");
         }
     }
