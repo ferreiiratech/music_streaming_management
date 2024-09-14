@@ -114,6 +114,26 @@ public class ArtistServiceImpl implements IArtistService {
         }
     }
 
+    @Override
+    public ArtistDeleteResponseDTO deleteArtistById(Long artistId) {
+        try {
+            Optional<ArtistEntity> artistFound = artistRepository.findById(artistId);
+
+            if(artistFound.isEmpty()){
+                throw new IllegalArgumentException("Artist not found");
+            }
+
+            artistRepository.deleteById(artistId);
+
+            return new ArtistDeleteResponseDTO(
+                    true,
+                    "Artist deleted successfully"
+            );
+        } catch (DataAccessResourceFailureException exception){
+            throw new AccessDatabaseFailureException("An internal error has occurred. Try again later");
+        }
+    }
+
     private ArtistEntity getExistingArtist(Long artistId){
         try {
             Optional<ArtistEntity> artistFound = artistRepository.findById(artistId);
