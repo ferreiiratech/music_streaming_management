@@ -77,21 +77,15 @@ public class MusicServiceImpl implements IMusicService {
         try {
             validateMusicDate(musicRequestDTO);
 
-            Optional<MusicEntity> musicFound = musicRepository.findById(musicId);
-
-            if(musicFound.isEmpty()) {
-                throw new MusicNotFoundException("Music not found");
-            }
-
+            MusicEntity musicFound = getExistingMusic(musicId);
             ArtistEntity artistFound = getExistingArtist(musicRequestDTO.artist());
-
             AlbumEntity albumFound = getExistingAlbum(musicRequestDTO.album());
 
-            BeanUtils.copyProperties(musicRequestDTO, musicFound.get());
-            musicFound.get().setArtist(artistFound);
-            musicFound.get().setAlbum(albumFound);
+            BeanUtils.copyProperties(musicRequestDTO, musicFound);
+            musicFound.setArtist(artistFound);
+            musicFound.setAlbum(albumFound);
 
-            MusicEntity musicUpdated = musicRepository.save(musicFound.get());
+            MusicEntity musicUpdated = musicRepository.save(musicFound);
 
             return new MusicUpdatedResponseDTO(
                     true,
@@ -113,24 +107,34 @@ public class MusicServiceImpl implements IMusicService {
     @Override
     public MusicGetResponseDTO getMusicById(Long musicId) {
         try {
+            MusicEntity musicFound = getExistingMusic(musicId);
+
+            return new MusicGetResponseDTO(
+                    true,
+                    "Music found success",
+                    new MusicDataDTO(
+                            musicFound.getTitle(),
+                            musicFound.getGenre(),
+                            musicFound.getDuration(),
+                            musicFound.getReleaseDate(),
+                            musicFound.getArtist().getName(),
+                            musicFound.getAlbum().getTitle()
+                    )
+            );
+        } catch (DataAccessResourceFailureException exception) {
+            throw new AccessDatabaseFailureException("An internal error has occurred. Try again later");
+        }
+    }
+
+    private MusicEntity getExistingMusic(Long musicId) {
+        try {
             Optional<MusicEntity> musicFound = musicRepository.findById(musicId);
 
             if(musicFound.isEmpty()) {
                 throw new MusicNotFoundException("Music not found");
             }
 
-            return new MusicGetResponseDTO(
-                    true,
-                    "Music found success",
-                    new MusicDataDTO(
-                            musicFound.get().getTitle(),
-                            musicFound.get().getGenre(),
-                            musicFound.get().getDuration(),
-                            musicFound.get().getReleaseDate(),
-                            musicFound.get().getArtist().getName(),
-                            musicFound.get().getAlbum().getTitle()
-                    )
-            );
+            return musicFound.get();
         } catch (DataAccessResourceFailureException exception) {
             throw new AccessDatabaseFailureException("An internal error has occurred. Try again later");
         }
