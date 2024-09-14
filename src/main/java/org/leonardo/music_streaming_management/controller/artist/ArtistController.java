@@ -32,4 +32,13 @@ public class ArtistController {
         ArtistGetResponseDTO artistGetResponseDTO = artistService.getArtistById(id);
         return ResponseEntity.status(HttpStatus.OK).body(artistGetResponseDTO);
     }
+
+    @GetMapping
+    public ResponseEntity<ArtistListResponseDTO> getAllArtists(
+            @RequestParam(required = false, defaultValue = "0") int page,
+            @RequestParam(required = false, defaultValue = "10") int size
+    ) {
+        ArtistListResponseDTO artistListResponseDTO = artistService.getAllArtist(page, size);
+        return ResponseEntity.status(HttpStatus.OK).body(artistListResponseDTO);
+    }
 }
