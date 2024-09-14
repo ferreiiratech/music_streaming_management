@@ -1,6 +1,6 @@
 package org.leonardo.music_streaming_management.controller.music;
 
-import org.leonardo.music_streaming_management.dto.music.MusicCreateRequestDTO;
+import org.leonardo.music_streaming_management.dto.music.MusicRequestDTO;
 import org.leonardo.music_streaming_management.dto.music.MusicCreatedResponseDTO;
 import org.leonardo.music_streaming_management.service.music.IMusicService;
 import org.springframework.http.ResponseEntity;
@@ -16,8 +16,8 @@ public class MusicController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<MusicCreatedResponseDTO> createMusic(@RequestBody MusicCreateRequestDTO musicCreateRequestDTO) {
-        MusicCreatedResponseDTO musicCreatedResponseDTO = musicService.createMusic(musicCreateRequestDTO);
+    public ResponseEntity<MusicCreatedResponseDTO> createMusic(@RequestBody MusicRequestDTO musicRequestDTO) {
+        MusicCreatedResponseDTO musicCreatedResponseDTO = musicService.createMusic(musicRequestDTO);
         return ResponseEntity.ok(musicCreatedResponseDTO);
     }
 }
