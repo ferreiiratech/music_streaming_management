@@ -7,7 +7,7 @@ import org.leonardo.music_streaming_management.model.artist.ArtistEntity;
 import org.leonardo.music_streaming_management.model.music.MusicEntity;
 import org.leonardo.music_streaming_management.model.music.exception.*;
 import org.leonardo.music_streaming_management.repository.album.AlbumRepository;
-import org.leonardo.music_streaming_management.repository.artist.ArtistRepository;
+import org.leonardo.music_streaming_management.repository.artist.IArtistRepository;
 import org.leonardo.music_streaming_management.repository.music.IMusicRepository;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.beans.BeanUtils;
@@ -25,12 +25,12 @@ import java.util.Optional;
 public class MusicServiceImpl implements IMusicService {
     private final IMusicRepository IMusicRepository;
     private final AlbumRepository albumRepository;
-    private final ArtistRepository artistRepository;
+    private final IArtistRepository artistRepository;
 
     public MusicServiceImpl(
             IMusicRepository IMusicRepository,
             AlbumRepository albumRepository,
-            ArtistRepository artistRepository
+            IArtistRepository artistRepository
     ) {
         this.IMusicRepository = IMusicRepository;
         this.albumRepository = albumRepository;
