@@ -21,15 +21,18 @@ public class ArtistController {
         return ResponseEntity.status(HttpStatus.CREATED).body(artistCreatedResponseDTO);
     }
 
-    @PatchMapping("/{id}")
-    public ResponseEntity<ArtistUpdateResponseDTO> updateArtist(@PathVariable Long id, @RequestBody ArtistRequestDTO artistRequestDTO) {
-        ArtistUpdateResponseDTO artistUpdateResponseDTO = artistService.updateArtist(id, artistRequestDTO);
+    @PatchMapping("/{artistId}")
+    public ResponseEntity<ArtistUpdateResponseDTO> updateArtist(
+            @PathVariable Long artistId,
+            @RequestBody ArtistRequestDTO artistRequestDTO
+    ) {
+        ArtistUpdateResponseDTO artistUpdateResponseDTO = artistService.updateArtist(artistId, artistRequestDTO);
         return ResponseEntity.status(HttpStatus.OK).body(artistUpdateResponseDTO);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ArtistGetResponseDTO> getArtistById(@PathVariable Long id) {
-        ArtistGetResponseDTO artistGetResponseDTO = artistService.getArtistById(id);
+    @GetMapping("/{artistId}")
+    public ResponseEntity<ArtistGetResponseDTO> getArtistById(@PathVariable Long artistId) {
+        ArtistGetResponseDTO artistGetResponseDTO = artistService.getArtistById(artistId);
         return ResponseEntity.status(HttpStatus.OK).body(artistGetResponseDTO);
     }
 
@@ -42,9 +45,9 @@ public class ArtistController {
         return ResponseEntity.status(HttpStatus.OK).body(artistListResponseDTO);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<ArtistDeleteResponseDTO> deleteArtistById(@PathVariable Long id) {
-        ArtistDeleteResponseDTO artistDeleteResponseDTO = artistService.deleteArtistById(id);
+    @DeleteMapping("/{artistId}")
+    public ResponseEntity<ArtistDeleteResponseDTO> deleteArtistById(@PathVariable Long artistId) {
+        ArtistDeleteResponseDTO artistDeleteResponseDTO = artistService.deleteArtistById(artistId);
         return ResponseEntity.status(HttpStatus.OK).body(artistDeleteResponseDTO);
     }
 }

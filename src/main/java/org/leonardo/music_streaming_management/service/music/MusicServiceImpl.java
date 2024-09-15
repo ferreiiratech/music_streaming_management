@@ -15,8 +15,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.time.chrono.ChronoLocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -272,16 +270,8 @@ public class MusicServiceImpl implements IMusicService {
             throw new InvalidMusicArtistException("Music artist cannot be empty");
         }
 
-        if(musicRequestDTO.album() == null || musicRequestDTO.album().isEmpty()) {
-            throw new InvalidMusicAlbumException("Music album cannot be empty");
-        }
-
         if(musicRequestDTO.duration() <= 0){
             throw new InvalidMusicDurationException("Music duration cannot be negative or zero");
-        }
-
-        if(musicRequestDTO.releaseDate().isBefore(ChronoLocalDateTime.from(LocalDateTime.now()))){
-            throw new InvalidMusicReleaseDateException("Music release date cannot be before current date");
         }
     }
 }

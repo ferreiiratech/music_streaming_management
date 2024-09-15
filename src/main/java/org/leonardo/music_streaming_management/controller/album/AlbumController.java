@@ -21,15 +21,18 @@ public class AlbumController {
         return ResponseEntity.status(HttpStatus.CREATED).body(albumCreatedResponseDTO);
     }
 
-    @PatchMapping("/{id}")
-    public ResponseEntity<AlbumUpdateResponseDTO> updateAlbum(@PathVariable Long id, @RequestBody AlbumRequestDTO albumRequestDTO){
-        AlbumUpdateResponseDTO albumUpdateResponseDTO = albumService.updateAlbum(id, albumRequestDTO);
+    @PatchMapping("/{albumId}")
+    public ResponseEntity<AlbumUpdateResponseDTO> updateAlbum(
+            @PathVariable Long albumId,
+            @RequestBody AlbumRequestDTO albumRequestDTO
+    ){
+        AlbumUpdateResponseDTO albumUpdateResponseDTO = albumService.updateAlbum(albumId, albumRequestDTO);
         return ResponseEntity.status(HttpStatus.OK).body(albumUpdateResponseDTO);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<AlbumGetResponseDTO> getAlbumById(@PathVariable Long id){
-        AlbumGetResponseDTO albumGetResponseDTO = albumService.getAlbumById(id);
+    @GetMapping("/{albumId}")
+    public ResponseEntity<AlbumGetResponseDTO> getAlbumById(@PathVariable Long albumId){
+        AlbumGetResponseDTO albumGetResponseDTO = albumService.getAlbumById(albumId);
         return ResponseEntity.status(HttpStatus.OK).body(albumGetResponseDTO);
     }
 
@@ -42,9 +45,9 @@ public class AlbumController {
         return ResponseEntity.status(HttpStatus.OK).body(albumListResponseDTO);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<AlbumDeleteResponseDTO> deleteAlbum(@PathVariable Long id){
-        AlbumDeleteResponseDTO albumDeleteResponseDTO = albumService.deleteAlbumById(id);
+    @DeleteMapping("/{albumId}")
+    public ResponseEntity<AlbumDeleteResponseDTO> deleteAlbum(@PathVariable Long albumId){
+        AlbumDeleteResponseDTO albumDeleteResponseDTO = albumService.deleteAlbumById(albumId);
         return ResponseEntity.status(HttpStatus.OK).body(albumDeleteResponseDTO);
     }
 }

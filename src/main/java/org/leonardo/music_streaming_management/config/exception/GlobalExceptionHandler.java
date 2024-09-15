@@ -40,11 +40,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionResponseDTO(false, exception.getMessage()));
     }
 
-    @ExceptionHandler(InvalidMusicReleaseDateException.class)
-    public ResponseEntity<ExceptionResponseDTO> handleInvalidMusicReleaseDateException(InvalidMusicReleaseDateException exception) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionResponseDTO(false, exception.getMessage()));
-    }
-
     @ExceptionHandler(InvalidMusicTitleException.class)
     public ResponseEntity<ExceptionResponseDTO> handleInvalidMusicTitleException(InvalidMusicTitleException exception) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionResponseDTO(false, exception.getMessage()));
